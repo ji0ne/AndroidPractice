@@ -9,6 +9,7 @@ package com.example.swt_calendar_practice;
 import androidx.annotation.NonNull; // 매개변수, 필드, 메서드 반환값 등에 null이 아님을 표시하기 위해 사용되는 것
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 // activity_main.xml에서 추가한 디자인 부분
@@ -28,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     public String str = null; // editText에 들어갈 문자열을 null로 선언
     public CalendarView calendarView;
     public Button save_Btn;
-    public TextView titletextView, scheduleTextView;
+    public TextView titletextView, scheduleTextView; // 제목 text, 일정을 보여주는 text
     public EditText editText;
     
     // 초기 설정부
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 // diaryTextView.setText(String.format("%d / %d / %d", year, month, dayOfMonth));
                 // 위의 코드는 text로 달력의 날짜를 보이게 할때 사용하면 됨 ㅇㅇ
                 editText.setText(""); // text 지정인데 우리는 받아올 것 이므로 비워둔다.
+                checkDay(year, month, dayOfMonth);
             }
         });
         // 저장 버튼 onClick 이벤트
@@ -66,14 +68,15 @@ public class MainActivity extends AppCompatActivity {
                // onClick 이벤트에 따른 각 속성별 기능
                // 저장 버튼을 누르면 Day Select 전까지 저장 버튼과 editText가 안 보이게 함
                saveDiary(readSchedule);
-               str = editText.getText().toString();
+               str = editText.getText().toString(); // editText에 입력한 내용을 str에 저장
+               scheduleTextView.setText(str); // scheduleTextView에 str을 넣기
                save_Btn.setVisibility(View.INVISIBLE); // 저장 버튼 안 보이기
                editText.setVisibility(View.INVISIBLE); // 일정 입력창 안 보이기
                scheduleTextView.setVisibility(View.VISIBLE);
            }
         });
     }
-    // 일정 확인 부
+    // 일정 확인 부분
     public void checkDay(int cYear, int cMonth, int cDay){
         readSchedule = "" + cYear + "-" + (cMonth+1)+""+"-"+cDay+".txt"; // 저장할 파일 이름 설정
         FileInputStream fis; //FileInputSystem
@@ -95,14 +98,25 @@ public class MainActivity extends AppCompatActivity {
 
             if(scheduleTextView.getText() == null){
                 scheduleTextView.setVisibility(View.INVISIBLE);
+                save_Btn.setVisibility(View.VISIBLE);
                 titletextView.setVisibility(View.VISIBLE);
             }
         }catch(Exception e){
             e.printStackTrace();
         }
     }
-
+    // 완벽히 알맞은 코드나 충돌 가능성이 있는 코드를 사용할 때 @SuppressLint를 사용
+    @SuppressLint("WrongConstant") 
     public void saveDiary(String readSchedule){
         FileOutputStream fos;
+        try{
+            fos = openFileOutput(readSchedule, MODE_NO_LOCALIZED_COLLATORS);
+            String content = editText.getText().toString();
+            fos.write((content).getBytes());
+            fos.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
