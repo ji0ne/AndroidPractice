@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     public String readSchedule = null;
     public String str = null; // editText에 들어갈 문자열을 null로 선언
     public CalendarView calendarView;
-    public Button save_Btn;
+    public Button save_Btn, correction_Btn, del_Btn; // activity_main에서와 id값이 달라도 아래에 선언시에 고쳐주면 됨
     public TextView titletextView, scheduleTextView; // 제목 text, 일정을 보여주는 text
     public EditText editText;
     
@@ -39,11 +39,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // activity_main.xml에서 추가한 디자인들을 변수에 각 디자인들의 id를 선언
-        titletextView = findViewById(R.id.titletextView);
-        calendarView = findViewById(R.id.calendarView);
-        editText = findViewById(R.id.editText);
-        save_Btn = findViewById(R.id.saveBtn);
-        scheduleTextView = findViewById(R.id.scheduletextView);
+        titletextView = findViewById(R.id.titletextView); // 캘린더의 타이틀
+        calendarView = findViewById(R.id.calendarView); // 캘린더
+        editText = findViewById(R.id.editText); // text 입력 구간
+        save_Btn = findViewById(R.id.saveBtn); // 저장 버튼
+        correction_Btn = findViewById(R.id.correctionBtn); // 수정 버튼
+        del_Btn = findViewById(R.id.delBtn); // 삭제 버튼
+        scheduleTextView = findViewById(R.id.scheduletextView); // 저장한 일정 보여주는 text
 
         // https://5stralia.tistory.com/14
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() { // 날짜 선택 listener
@@ -52,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 // 속성을 보이게 할지 안보이게 할지 정하는 부분, VISIBLE, INVISIBLE
                 titletextView.setVisibility(View.VISIBLE);
                 save_Btn.setVisibility(View.VISIBLE);
+                correction_Btn.setVisibility(View.INVISIBLE);
+                del_Btn.setVisibility(View.INVISIBLE);
                 editText.setVisibility(View.VISIBLE);
                 scheduleTextView.setVisibility(View.INVISIBLE); // 날짜에 저장된 일정은 저장 전까지 보이면 안되므로 INVISIBLE 처리
                                 
@@ -71,6 +75,8 @@ public class MainActivity extends AppCompatActivity {
                str = editText.getText().toString(); // editText에 입력한 내용을 str에 저장
                scheduleTextView.setText(str); // scheduleTextView에 str을 넣기
                save_Btn.setVisibility(View.INVISIBLE); // 저장 버튼 안 보이기
+               correction_Btn.setVisibility(View.VISIBLE);
+               del_Btn.setVisibility(View.VISIBLE);
                editText.setVisibility(View.INVISIBLE); // 일정 입력창 안 보이기
                scheduleTextView.setVisibility(View.VISIBLE);
            }
@@ -95,6 +101,33 @@ public class MainActivity extends AppCompatActivity {
             scheduleTextView.setText(str);
 
             save_Btn.setVisibility(View.INVISIBLE);
+            correction_Btn.setVisibility(View.VISIBLE);
+            del_Btn.setVisibility(View.VISIBLE);
+
+            correction_Btn.setOnClickListener(new View.OnClickListener() { // 수정 버튼을 누르면
+                @Override
+                public void onClick(View view) {
+                    editText.setVisibility(View.VISIBLE);
+                    scheduleTextView.setVisibility(View.INVISIBLE);
+                    editText.setText(str); // edit 창에 일정이 나오고
+
+                    save_Btn.setVisibility(View.VISIBLE); // 새로 저장용 버튼 보이기
+                    correction_Btn.setVisibility(View.INVISIBLE);
+                    del_Btn.setVisibility(View.INVISIBLE);
+                    scheduleTextView.setText(editText.getText()); // 일정 업데이트
+                }
+            });
+            del_Btn.setOnClickListener(new View.OnClickListener() { // 삭제 버튼을 누르면
+                @Override
+                public void onClick(View view) {
+                    scheduleTextView.setVisibility(View.INVISIBLE);
+                    editText.setText(""); // 빈 값
+                    editText.setVisibility(View.VISIBLE);
+                    save_Btn.setVisibility(View.VISIBLE);
+                    correction_Btn.setVisibility(View.INVISIBLE);
+                    del_Btn.setVisibility(View.INVISIBLE);
+                }
+            });
 
             if(scheduleTextView.getText() == null){
                 scheduleTextView.setVisibility(View.INVISIBLE);
