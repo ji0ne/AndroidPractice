@@ -1,23 +1,16 @@
 package kr.ac.uc.calendar;
 
-<<<<<<< HEAD
 import android.graphics.Color;
-=======
->>>>>>> e1926720de9ef39675ce072537172d0c9eb8b1ad
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.TextView;
-<<<<<<< HEAD
 import android.widget.Toast;
-=======
->>>>>>> e1926720de9ef39675ce072537172d0c9eb8b1ad
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-<<<<<<< HEAD
 import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
@@ -33,18 +26,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
 
-=======
-import java.util.ArrayList;
-
-public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>{
-    ArrayList<String> dayList;
-    public CalendarAdapter(ArrayList<String> dayList){
-        this.dayList = dayList;
-    }
-
-
-    
->>>>>>> e1926720de9ef39675ce072537172d0c9eb8b1ad
     @NonNull
     @Override
     public CalendarAdapter.CalendarViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -57,7 +38,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     @Override
     public void onBindViewHolder(@NonNull CalendarAdapter.CalendarViewHolder holder, int position) {
-<<<<<<< HEAD
         //날짜 변수에 담기
         LocalDate day = dayList.get(position);
 
@@ -83,6 +63,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         }
 
         //날짝 클릭했을때
+        //
         holder.itemView.setOnClickListener(v -> {
 
             int iYear = day.getYear();
@@ -96,10 +77,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         });
 
 
-=======
-
-        holder.tvDay.setText(dayList.get(position));
->>>>>>> e1926720de9ef39675ce072537172d0c9eb8b1ad
     }
 
     @Override
@@ -110,19 +87,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     class CalendarViewHolder extends  RecyclerView.ViewHolder{
         TextView tvDay;
 
-<<<<<<< HEAD
         View parentView;
-=======
->>>>>>> e1926720de9ef39675ce072537172d0c9eb8b1ad
 
         public CalendarViewHolder(@NonNull View itemView) {
             super(itemView);
 
-<<<<<<< HEAD
             parentView = itemView.findViewById(R.id.parentView);
 
-=======
->>>>>>> e1926720de9ef39675ce072537172d0c9eb8b1ad
             tvDay = itemView.findViewById(R.id.tvDay);
         }
     }
