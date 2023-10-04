@@ -89,6 +89,14 @@ public class MainActivity extends AppCompatActivity {
 
             editText.setVisibility(View.INVISIBLE);
             scheduleTextView.setVisibility(View.VISIBLE);
+            scheduleTextView.setText(str);
+
+            save_Btn.setVisibility(View.INVISIBLE);
+
+            if(scheduleTextView.getText() == null){
+                scheduleTextView.setVisibility(View.INVISIBLE);
+                titletextView.setVisibility(View.VISIBLE);
+            }
         }catch(Exception e){
             e.printStackTrace();
         }
