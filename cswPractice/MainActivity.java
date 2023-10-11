@@ -126,21 +126,36 @@ public class MainActivity extends AppCompatActivity {
                     save_Btn.setVisibility(View.VISIBLE);
                     correction_Btn.setVisibility(View.INVISIBLE);
                     del_Btn.setVisibility(View.INVISIBLE);
+                    removeDiary(readSchedule);
                 }
             });
 
             if(scheduleTextView.getText() == null){
                 scheduleTextView.setVisibility(View.INVISIBLE);
                 save_Btn.setVisibility(View.VISIBLE);
+                correction_Btn.setVisibility(View.INVISIBLE);
+                del_Btn.setVisibility(View.INVISIBLE);
                 titletextView.setVisibility(View.VISIBLE);
             }
         }catch(Exception e){
             e.printStackTrace();
         }
     }
+    @SuppressLint("WrongConstant")
+    public void removeDiary(String readSchedule){ // 일정 제거
+        FileOutputStream fos;
+        try{
+            fos = openFileOutput(readSchedule, MODE_NO_LOCALIZED_COLLATORS);
+            String content ="";
+            fos.write((content).getBytes());
+            fos.close();
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
     // 완벽히 알맞은 코드나 충돌 가능성이 있는 코드를 사용할 때 @SuppressLint를 사용
     @SuppressLint("WrongConstant") 
-    public void saveDiary(String readSchedule){
+    public void saveDiary(String readSchedule){ // 이 부분 이해해보기 fis, fos
         FileOutputStream fos;
         try{
             fos = openFileOutput(readSchedule, MODE_NO_LOCALIZED_COLLATORS);
