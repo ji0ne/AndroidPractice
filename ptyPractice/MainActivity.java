@@ -4,6 +4,7 @@ import android.content.Context;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
@@ -43,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
 
     String fileName;
     String yearMonDay;
-
+    TextView tvTodoDay;
     ImageButton btnPre,btnNext;
 
 
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         rvCalendar = findViewById(R.id.rvCalendar);
         rvTodo = findViewById(R.id.rvTodo);
         btnSave = findViewById(R.id.btnSave);
+        etInput = findViewById(R.id.etInput);
+        tvTodoDay = findViewById(R.id.tvTodoDay);
 
         CalendarUtil.selectedDate = LocalDate.now();
        // yearMonDay = String.valueOf(CalendarUtil.selectedDate);
@@ -66,9 +70,10 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
 
 
 
-
+        tvTodoDay.setText(dayMonthFromDate(CalendarUtil.selectedDate)+" 일정");
         setMonthView();
         setTodoView();
+
 
         btnSave.setOnClickListener(v -> {
 
@@ -76,13 +81,16 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
             setTodoView();
         });
 
+        //달을 바꿀때 마다
         btnPre.setOnClickListener(v -> {
             CalendarUtil.selectedDate = CalendarUtil.selectedDate.minusMonths(1);
             setMonthView();
+            setTodoView();
         });
         btnNext.setOnClickListener(v -> {
             CalendarUtil.selectedDate = CalendarUtil.selectedDate.plusMonths(1);
             setMonthView();
+            setTodoView();
         });
     }
 
@@ -122,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
 
         TodoAdapter adapter = new TodoAdapter(openFile()); //날
 
-        RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(),1);
+        RecyclerView.LayoutManager manager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
 
         rvTodo.setLayoutManager(manager);
         rvTodo.setAdapter(adapter);
@@ -168,39 +176,50 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         return  dayList;
     }
 
-    public ArrayList<String> openFile(){
+    private ArrayList<String> openFile(){
         ArrayList<String> todoList = new ArrayList<>();
 
-        byte[] txt = new byte[1024];
+
         try {
 
-            FileInputStream inFs  = openFileInput(fileName);
+            FileInputStream inFs  = this.openFileInput(fileName);
+            byte[] txt = new byte[inFs.available()];
             inFs.read(txt);
             inFs.close();
-        } catch (IOException e) {
+            String str = new String(txt);
+            StringTokenizer st = new StringTokenizer(str, "\n");
+            while (st.hasMoreTokens()) {
+                todoList.add(st.nextToken());
+            }
+        } catch (FileNotFoundException e) {
+            //파일 없을때 todo로 recycler view 활용 말고 다른 표현방법 만들기
+            todoList.add("일정이 없습니다.");
+        } catch (IOException e){
             e.printStackTrace();
         }
-        /*
-        StringTokenizer st = new StringTokenizer(txt.toString(), "\n");
-        while (st.hasMoreTokens()) {
-            todoList.add(st.nextToken());
-        }*/
+
 
         return todoList;
     }
 
-    public void saveFile(){
-        FileOutputStream outFs;
+    private void saveFile(){
+        //time picker 로 시간 설정 > string 으로 바꿔서 saveFile()에 던져주고 txt에 같이 저장 > 시간순정렬이 안되네
+        // ArrayList string 으로 하나 더 만들어서 시간만 넣기 파일열때 int 바꿔서 정렬 , 그럼 todolist는 어케 정렬하지
+        // sqlite 쓰는게 맞다
         try {
-            outFs = openFileOutput(fileName,Context.MODE_APPEND);
-            String str = etInput.getText().toString();
+            FileOutputStream outFs = this.openFileOutput(fileName,Context.MODE_APPEND);
+            String str = etInput.getText().toString()+"\n";
             outFs.write(str.getBytes());
             outFs.close();
+        }catch (FileNotFoundException e){
+
         }
         catch (IOException e){
-            Log.d(TAG,"save_error");
             e.printStackTrace();
         }
+
+        etInput.setText("");
+
     }
 
 
@@ -208,15 +227,16 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
 
 
     //CalendarAdapter > holder.itemView.setOnClickListener 에서 클릭하면 Main > onItemClick 실행.
-    //onItemClick 에서 filename 읽기 > setTodoView 메소드 만들고 거기서 adapter >tokenizer 로 스플릿해서 todoCell 에 나눠넣기.
+    //onItemClick 에서 클릭한 날짜 가져와서 filename 저장  >
+    // setTodoView  실행
     @Override
     public void onItemClick(String dayText) {
         //monthFromDate(CalendarUtil.selectedDate) = 2023년 xx월
         yearMonDay = monthFromDate(CalendarUtil.selectedDate)+ " " + dayText + "일";
         //yearMonDay = 2023년 xx월 xx일
         fileName = yearMonDay+".txt";
+        tvTodoDay.setText(yearMonDay+" 일정");
         setTodoView();
-        Toast.makeText(this,yearMonDay,Toast.LENGTH_SHORT).show();
     }
 
 

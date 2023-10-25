@@ -71,7 +71,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             String yearMonDay = iYear+"년 "+iMonth+"월 "+iDay+"일";
             Toast.makeText(holder.itemView.getContext(), yearMonDay, Toast.LENGTH_SHORT).show(); */
             holder.parentView.setBackgroundResource(R.drawable.layout_background2);
-            onItemListener.onItemClick(day);
+            //클릭시 todo 배경 레이아웃 바꾸기
+            //다른 날 클릭하면 전에 클릭했던 날짜 배경레이아웃 원래대로 돌리게 만들기
+
+            if(Integer.parseInt(day)<dayList.size())
+                onItemListener.onItemClick(day);
 
         });
 

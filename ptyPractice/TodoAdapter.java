@@ -32,8 +32,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
     @Override
     public void onBindViewHolder(@NonNull TodoViewHolder holder, int position) {
 
-        String todo = todoList.get(position);
-        holder.cbTodo.setText(todo);
+
+                holder.cbTodo.setText(todoList.get(position));
 
     }
 
@@ -51,7 +51,22 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
             super(itemView);
             cbTodo = itemView.findViewById(R.id.cbTodo);
             btnDel = itemView.findViewById(R.id.btnDel);
+
+            btnDel.setOnClickListener(v -> {
+                //main에 position을 넘겨줘서 삭제 메소드 만들고 파일 열어서 자르고 todolist에 넣고
+                //position에 해당하는 인덱스 todolist에서 삭제 후 파일 저장.
+                deleteItem(getPosition());
+
+            });
+
+
         }
     }
+    public void deleteItem(int position) {
+        todoList.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, todoList.size());
+    }
+
 
 }
