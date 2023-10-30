@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
+    android:background="#FFF"
     android:orientation="vertical">
 
 
@@ -12,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
-        android:background="#03A9F4"
+        android:background="#FFF"
         android:orientation="horizontal">
 
         <ImageButton
@@ -20,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#03A9F4"
+            android:backgroundTint="#FFF"
             android:src="@android:drawable/ic_media_rew" />
 
         <TextView
@@ -38,7 +39,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:backgroundTint="#03A9F4"
+            android:backgroundTint="#FFF"
             android:src="@android:drawable/ic_media_ff" />
     </LinearLayout>
 
@@ -64,10 +65,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="월"
-            android:textStyle="italic"
-            android:textSize="18sp"
             android:textAlignment="center"
-             />
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/textView4"
@@ -75,9 +76,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="화"
-            android:textStyle="italic"
+            android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="18sp"
-            android:textAlignment="center" />
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/textView5"
@@ -85,9 +87,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="수"
-            android:textStyle="italic"
+            android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="18sp"
-            android:textAlignment="center" />
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/textView6"
@@ -95,9 +98,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="목"
-            android:textStyle="italic"
+            android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="18sp"
-            android:textAlignment="center" />
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/textView7"
@@ -105,9 +109,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="금"
-            android:textStyle="italic"
+            android:textAlignment="center"
+            android:textColor="@color/black"
             android:textSize="18sp"
-            android:textAlignment="center" />
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/textView8"
@@ -145,9 +150,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="일정을 입력하세요."
             android:gravity="start|top"
-            android:inputType="textMultiLine" />
+            android:hint="일정을 입력하세요."
+
+            android:inputType="textMultiLine"
+            android:textColor="@color/black"
+            android:textColorHint="@android:color/darker_gray" />
 
         <Button
             android:id="@+id/btnSave"
