@@ -14,7 +14,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     //버튼 변수 선언 : 버튼 객체 나타냄
-    //Button btn_main_toPersonalWeeklyPlan ,
+    Button btn_main_toPersonalWeeklyPlan;
     Button btn_main_toAddSchedule;
     // 프래그먼트 변수 선언 : 프래그먼트 객체 생성
     //Fragment personalWeeklySchedulerMain;
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main); //현 엑티비티의 레이아웃을 activity_main으로 설정
 
         //xml 레이아웃에서 id로 버튼을 찾아 변수에 연결
-        //btn_main_toPersonalWeeklyPlan = findViewById(R.id.btn_main_toPersonalWeeklyPlan);
+        btn_main_toPersonalWeeklyPlan = findViewById(R.id.btn_main_toPersonalWeeklyPlan);
         btn_main_toAddSchedule = findViewById(R.id.btn_main_toAddSchedule);
 
 
@@ -59,6 +59,15 @@ public class MainActivity extends AppCompatActivity {
             fragmentTransaction.commit();
 
         }); */
+
+        btn_main_toPersonalWeeklyPlan.setOnClickListener(v -> {
+
+            Intent PersonalIntent = new Intent(getApplicationContext() , PersonalSchedule.class);
+            //화면 전환 수행을 위한 인텐트 객체 생성 , AddSchedule 엑티비티로 전환
+            startActivity(PersonalIntent); //startActivity 메서드로 인텐트 실행
+
+        });
+
 
         btn_main_toAddSchedule.setOnClickListener(v -> {
             
