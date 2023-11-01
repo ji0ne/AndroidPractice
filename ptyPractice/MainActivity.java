@@ -23,6 +23,7 @@ import org.threeten.bp.YearMonth;
 import org.threeten.bp.format.DateTimeFormatter;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,20 +33,11 @@ import java.util.StringTokenizer;
 
 
 public class MainActivity extends AppCompatActivity implements OnItemListener{
-
-    TextView tvMonth;
-
+    TextView tvTodoDay, tvMonth;
     RecyclerView rvCalendar,rvTodo;
-
-    private static final String TAG = "error_save";
-    private static final String TAG1 = "error_read";
-
     Button btnSave;
     EditText etInput;
-
-    String fileName;
-    String yearMonDay;
-    TextView tvTodoDay;
+    String fileName,yearMonDay;
     ImageButton btnPre,btnNext;
 
 
@@ -54,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         AndroidThreeTen.init(this);
-
         tvMonth = findViewById(R.id.tvMonth);
         btnPre = findViewById(R.id.btnPre);
         btnNext = findViewById(R.id.btnNext);
@@ -63,20 +54,14 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         btnSave = findViewById(R.id.btnSave);
         etInput = findViewById(R.id.etInput);
         tvTodoDay = findViewById(R.id.tvTodoDay);
-
         CalendarUtil.selectedDate = LocalDate.now();
-       // yearMonDay = String.valueOf(CalendarUtil.selectedDate);
         fileName = dayMonthFromDate(CalendarUtil.selectedDate)+".txt";
-
-
-
         tvTodoDay.setText(dayMonthFromDate(CalendarUtil.selectedDate)+" 일정");
         setMonthView();
         setTodoView();
 
 
         btnSave.setOnClickListener(v -> {
-
             saveFile();
             setTodoView();
         });
@@ -93,58 +78,33 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
             setTodoView();
         });
     }
-
-
-
-
     private String monthFromDate(LocalDate date){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy년 MM월");
         return date.format(dtf);
     }
-
     private String dayMonthFromDate(LocalDate date){
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy년 MM월 d일");
         return date.format(dtf);
     }
 
-
-
-
     private  void setMonthView(){
         tvMonth.setText(monthFromDate(CalendarUtil.selectedDate));
-
         ArrayList<String> dayList = dayInMonthArray(CalendarUtil.selectedDate);
-
-
-
         CalendarAdapter adapter = new CalendarAdapter(dayList,MainActivity.this);
-
         RecyclerView.LayoutManager manager = new GridLayoutManager(getApplicationContext(),7);
-
         rvCalendar.setLayoutManager(manager);
-
         rvCalendar.setAdapter(adapter);
     }
-
     private void setTodoView(){
-
-        TodoAdapter adapter = new TodoAdapter(openFile()); //날
-
+        TodoAdapter adapter = new TodoAdapter(openFile(),openCheckedList(),MainActivity.this); //날
         RecyclerView.LayoutManager manager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
-
         rvTodo.setLayoutManager(manager);
         rvTodo.setAdapter(adapter);
-
     }
-
-
-
 
     private ArrayList<String> dayInMonthArray(LocalDate date){
         ArrayList<String> dayList = new ArrayList<>();
-
         YearMonth yearMonth = YearMonth.from(date);
-
         //해당 월의 마지막 날짜 가져오기 ex)31
         int lastDay = yearMonth.lengthOfMonth();
 
@@ -167,21 +127,17 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
             if (dayList.get(i).equals(""))
                 cnt++;
         }
-        if(cnt == 7){
-            while(cnt>0) {
-                dayList.remove(0);
-                cnt--;
-            }
-        }
+        //0~6이 전부 빈칸이 들어가면
+        if(cnt == 7)
+            dayList.removeIf(n -> n.equals(""));
+        //dayList 중 빈칸 다 삭제
         return  dayList;
     }
 
     private ArrayList<String> openFile(){
         ArrayList<String> todoList = new ArrayList<>();
 
-
         try {
-
             FileInputStream inFs  = this.openFileInput(fileName);
             byte[] txt = new byte[inFs.available()];
             inFs.read(txt);
@@ -192,14 +148,34 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
                 todoList.add(st.nextToken());
             }
         } catch (FileNotFoundException e) {
-            //파일 없을때 todo로 recycler view 활용 말고 다른 표현방법 만들기
-            todoList.add("일정이 없습니다.");
+            Toast.makeText(this,"일정이 없습니다.",Toast.LENGTH_SHORT).show();
         } catch (IOException e){
             e.printStackTrace();
         }
 
-
         return todoList;
+    }
+    private  ArrayList<Boolean> openCheckedList(){
+        ArrayList<Boolean> checkedList = new ArrayList<>();
+        try {
+            FileInputStream inFs  = this.openFileInput("checked_"+fileName);
+            byte[] txt = new byte[inFs.available()];
+            inFs.read(txt);
+            inFs.close();
+            String str = new String(txt);
+            StringTokenizer st = new StringTokenizer(str, "\n");
+            while (st.hasMoreTokens()) {
+                if(st.nextToken().equals("1"))
+                    checkedList.add(true);
+                else
+                    checkedList.add(false);
+            }
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+        return checkedList;
     }
 
     private void saveFile(){
@@ -211,8 +187,12 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
             String str = etInput.getText().toString()+"\n";
             outFs.write(str.getBytes());
             outFs.close();
+            outFs = this.openFileOutput("checked_"+fileName,Context.MODE_APPEND);
+            str = "0\n";
+            outFs.write(str.getBytes());
+            outFs.close();
         }catch (FileNotFoundException e){
-
+            Toast.makeText(this,fileName+"이 존재하지 않습니다.",Toast.LENGTH_SHORT).show();
         }
         catch (IOException e){
             e.printStackTrace();
@@ -221,10 +201,6 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         etInput.setText("");
 
     }
-
-
-
-
 
     //CalendarAdapter > holder.itemView.setOnClickListener 에서 클릭하면 Main > onItemClick 실행.
     //onItemClick 에서 클릭한 날짜 가져와서 filename 저장  >
@@ -237,6 +213,56 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         fileName = yearMonDay+".txt";
         tvTodoDay.setText(yearMonDay+" 일정");
         setTodoView();
+    }
+
+    @Override
+    public void onDeleteCilck(int position) {
+        //해당날자 파일 열어서 todoList에 담기
+        ArrayList<String> todoList = openFile();
+        ArrayList<Boolean> checkedList = openCheckedList();
+        // 삭제버튼누른 포지션 받아와서 todoList 에서 해당 인덱스 삭제
+        todoList.remove(position);
+        checkedList.remove(position);
+        //다시 파일 생성.
+        try {
+            FileOutputStream outFs = this.openFileOutput(fileName,Context.MODE_PRIVATE);
+            for(String str : todoList){
+                str +="\n";
+                outFs.write(str.getBytes());
+            }
+            outFs.close();
+            FileOutputStream outFs2 = this.openFileOutput("checked_"+fileName,Context.MODE_PRIVATE);
+            for(Boolean bool : checkedList){
+                if(bool)
+                    outFs2.write("1\n".getBytes());
+                else
+                    outFs2.write("0\n".getBytes());
+            }
+            outFs2.close();
+        } catch (FileNotFoundException e) {
+            Toast.makeText(this,fileName+"이 존재하지 않습니다.",Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Override
+    public void onCheckedChange(int position, boolean isChecked) {
+        ArrayList<Boolean> checkedList = openCheckedList();
+        checkedList.set(position,isChecked);
+        try {
+            FileOutputStream outFs = this.openFileOutput("checked_"+fileName,Context.MODE_PRIVATE);
+            for(Boolean bool : checkedList){
+               if(bool)
+                   outFs.write("1\n".getBytes());
+               else
+                   outFs.write("0\n".getBytes());
+            }
+            outFs.close();
+        } catch (FileNotFoundException e) {
+            Toast.makeText(this,"checked_"+fileName+"이 존재하지 않습니다.",Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
