@@ -20,6 +20,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 // 저장을 위한 FileInput, Ouput
+import com.prolificinteractive.materialcalendarview.CalendarDay; // Materialview
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView; // Materialview
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -40,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
         // activity_main.xml에서 추가한 디자인들을 변수에 각 디자인들의 id를 선언
         titletextView = findViewById(R.id.titletextView); // 캘린더의 타이틀
-        calendarView = findViewById(R.id.calendarView); // 캘린더
+        //calendarView = findViewById(R.id.calendarView); // 캘린더
+        MaterialCalendarView materialCalendarView = findViewById(R.id.calendarView); // MaterialCalendarView
+        materialCalendarView.setSelectedDate(CalendarDay.today()); // MaterialCalendarView
         editText = findViewById(R.id.editText); // text 입력 구간
         save_Btn = findViewById(R.id.saveBtn); // 저장 버튼
         correction_Btn = findViewById(R.id.correctionBtn); // 수정 버튼

@@ -1,30 +1,24 @@
 package kr.ac.uc.calendar;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CalendarView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.threeten.bp.LocalDate;
-
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>{
     ArrayList<String> dayList;
+    boolean[] checkDay = new boolean[31];
     OnItemListener onItemListener;
-
-
     public CalendarAdapter(ArrayList<String> dayList , OnItemListener onItemListener){
         this.dayList = dayList;
         this.onItemListener = onItemListener;
-
     }
 
 
@@ -44,49 +38,35 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String day = dayList.get(position);
         int day1 =CalendarUtil.selectedDate.getDayOfMonth();
         holder.tvDay.setText(day);
-
-            //현재 날짜 색상 칠하기
-        // 다른 달에는 표시가 안되게 수정
+        //현재 날짜 색상 칠하기
+        // 다른 달에는 표시가 안되게 수정해야함.
         if(day.equals(String.valueOf(day1))){
             holder.parentView.setBackgroundResource(R.drawable.layout_background2);
         }
-        //토요일 ㄹ파랑
+        //토요일 파랑
         if( (position+1) % 7 == 0){
             holder.tvDay.setTextColor(Color.BLUE);
-           
         }   
         //일요일 빨강색
         else if (position % 7 == 0 || position == 0){
             holder.tvDay.setTextColor(Color.RED);
         }
-
         //날짝 클릭했을때
-        //
         holder.itemView.setOnClickListener(v -> {
-
-           /* int iYear = day.getYear();
-            int iMonth = day.getMonthValue();
-            int iDay = day.getDayOfMonth();
-            holder.itemView.setBackgroundColor(Color.GREEN);
-            String yearMonDay = iYear+"년 "+iMonth+"월 "+iDay+"일";
-            Toast.makeText(holder.itemView.getContext(), yearMonDay, Toast.LENGTH_SHORT).show(); */
-            holder.parentView.setBackgroundResource(R.drawable.layout_background2);
-            //클릭시 todo 배경 레이아웃 바꾸기
             //다른 날 클릭하면 전에 클릭했던 날짜 배경레이아웃 원래대로 돌리게 만들기
+            //빈칸 클릭시 리턴.
+            if(day.equals(""))
+                return;
 
-            if(Integer.parseInt(day)<dayList.size())
-                onItemListener.onItemClick(day);
-
+            holder.parentView.setBackgroundResource(R.drawable.layout_background2);
+            onItemListener.onItemClick(day);
         });
-
-
     }
 
     @Override
     public int getItemCount() {
         return dayList.size();
     }
-
     class CalendarViewHolder extends  RecyclerView.ViewHolder{
         TextView tvDay;
         View parentView;
