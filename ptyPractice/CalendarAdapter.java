@@ -10,13 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>{
     ArrayList<String> dayList;
-    boolean[] checkDay = new boolean[31];
+
     OnItemListener onItemListener;
-    public CalendarAdapter(ArrayList<String> dayList , OnItemListener onItemListener){
+    public CalendarAdapter(ArrayList<String> dayList ,OnItemListener onItemListener){
         this.dayList = dayList;
         this.onItemListener = onItemListener;
     }
@@ -51,6 +50,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         else if (position % 7 == 0 || position == 0){
             holder.tvDay.setTextColor(Color.RED);
         }
+
+
         //날짝 클릭했을때
         holder.itemView.setOnClickListener(v -> {
             //다른 날 클릭하면 전에 클릭했던 날짜 배경레이아웃 원래대로 돌리게 만들기
@@ -58,8 +59,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             if(day.equals(""))
                 return;
 
-            holder.parentView.setBackgroundResource(R.drawable.layout_background2);
             onItemListener.onItemClick(day);
+            holder.parentView.setBackgroundResource(R.drawable.layout_background2);
+
         });
     }
 

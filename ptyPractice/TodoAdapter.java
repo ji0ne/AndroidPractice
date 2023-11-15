@@ -1,14 +1,11 @@
 package kr.ac.uc.calendar;
 
-import android.graphics.Paint;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,15 +38,8 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
     @Override
     public void onBindViewHolder(@NonNull TodoViewHolder holder, int position) {
                 holder.cbTodo.setText(todoList.get(position));
-
                // holder.cbTodo.setOnCheckedChangeListener(null);
-
                  holder.cbTodo.setChecked(checkedList.get(position));
-            //checkBox 값 저장 방식
-            //1.날짜별로 checkList 파일 만들기 todoList.size()와 같은 수의  0\n 저장.
-            //2. string tokennizer 로 checkList파일 쪼개기
-            //3. boolean ArrayList 만들어서 0이면 false, 1이면 true add
-            //4. todoAdapter로 같이 보내기.
 
 
     }
@@ -90,7 +80,7 @@ public class TodoAdapter extends RecyclerView.Adapter<TodoAdapter.TodoViewHolder
     }
     public void deleteItem(int position) {
         onItemListener.onDeleteCilck(position);
-        todoList.remove(position);
+         todoList.remove(position);
         checkedList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, todoList.size());

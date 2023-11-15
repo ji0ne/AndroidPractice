@@ -1,29 +1,38 @@
 package kr.ac.uc.calendar;
 
+import android.Manifest;
 import android.content.Context;
-
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jakewharton.threetenabp.AndroidThreeTen;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONObject;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.YearMonth;
 import org.threeten.bp.format.DateTimeFormatter;
 
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,14 +40,27 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import cz.msebera.android.httpclient.Header;
+import kr.ac.uc.calendar.model.WeatherDataModel;
+
 
 public class MainActivity extends AppCompatActivity implements OnItemListener{
-    TextView tvTodoDay, tvMonth;
+    private static final String WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
+    private static final String APP_ID = "b5380dfef331638c759e3d381f5df9b9";
+    private static final String TAG = "MYWEATHER_DEBUG";
+    TextView tvTodoDay, tvMonth,tvTemp;
     RecyclerView rvCalendar,rvTodo;
     Button btnSave;
     EditText etInput;
     String fileName,yearMonDay;
     ImageButton btnPre,btnNext;
+    ImageView ivWeatherSymbol;
+    LocationManager locationManager;
+    LocationListener locationListener;
+    String[] permissions= {
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
 
 
     @Override
@@ -54,11 +76,15 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         btnSave = findViewById(R.id.btnSave);
         etInput = findViewById(R.id.etInput);
         tvTodoDay = findViewById(R.id.tvTodoDay);
+        ivWeatherSymbol = findViewById(R.id.ivWeatherSymbol);
+        tvTemp = findViewById(R.id.tvTemp);
+
         CalendarUtil.selectedDate = LocalDate.now();
         fileName = dayMonthFromDate(CalendarUtil.selectedDate)+".txt";
         tvTodoDay.setText(dayMonthFromDate(CalendarUtil.selectedDate)+" 일정");
         setMonthView();
         setTodoView();
+        locationChange();
 
 
         btnSave.setOnClickListener(v -> {
@@ -148,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
                 todoList.add(st.nextToken());
             }
         } catch (FileNotFoundException e) {
-            Toast.makeText(this,"일정이 없습니다.",Toast.LENGTH_SHORT).show();
         } catch (IOException e){
             e.printStackTrace();
         }
@@ -209,6 +234,13 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
     public void onItemClick(String dayText) {
         //monthFromDate(CalendarUtil.selectedDate) = 2023년 xx월
         yearMonDay = monthFromDate(CalendarUtil.selectedDate)+ " " + dayText + "일";
+        if(!dayMonthFromDate(LocalDate.now()).equals(yearMonDay))
+        {
+            tvTemp.setText("");
+            ivWeatherSymbol.setImageResource(R.drawable.dunno);
+        }
+        else
+            locationChange();
         //yearMonDay = 2023년 xx월 xx일
         fileName = yearMonDay+".txt";
         tvTodoDay.setText(yearMonDay+" 일정");
@@ -223,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         // 삭제버튼누른 포지션 받아와서 todoList 에서 해당 인덱스 삭제
         todoList.remove(position);
         checkedList.remove(position);
+        //0 1 2 3    f f t f
         //다시 파일 생성.
         try {
             FileOutputStream outFs = this.openFileOutput(fileName,Context.MODE_PRIVATE);
@@ -263,6 +296,57 @@ public class MainActivity extends AppCompatActivity implements OnItemListener{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private void locationChange(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
+            for(String permission : permissions){
+                if(ActivityCompat.checkSelfPermission(this,permission) == PackageManager.PERMISSION_DENIED){
+                    Log.d("aaaaaaaa",ActivityCompat.checkSelfPermission(this,permission)+"");
+                    ActivityCompat.requestPermissions(this,permissions,1);
+                    return;
+                }
+            }
+        }
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener(){
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                double lat = location.getLatitude();
+                double lon = location.getLongitude();
+                RequestParams params = new RequestParams();
+                params.put("lat", lat);
+                params.put("lon", lon);
+                params.put("appid", APP_ID);
+                taskOverNetworking(params);
+            }
+        };
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,1000,locationListener);
+    }
+    private void taskOverNetworking(RequestParams params){
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        String url = WEATHER_URL;
+        client.get(url, params, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d(TAG, "onSuccess: JSON: " + response.toString());
+                WeatherDataModel model = WeatherDataModel.fromJson(response);
+                updateUI(model);
+
+            }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
+                Log.d(TAG, "onFailure: Failed"+throwable.toString());
+                Log.d(TAG, "onFailure: Status code "+statusCode);
+                Toast.makeText(MainActivity.this, "Reuqest Failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateUI(WeatherDataModel model){
+        tvTemp.setText(model.getTemp());
+        int resourceID = getResources().getIdentifier(model.getIconName(), "drawable", getPackageName());
+        ivWeatherSymbol.setImageResource(resourceID);
     }
 
 
